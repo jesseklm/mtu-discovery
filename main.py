@@ -21,6 +21,8 @@ def ping_with_df(target, size):
         if 'Zielnetz nicht erreichbar.' in output:
             print(output)
             return -4
+        elif 'Paket msste fragmentiert werden, DF-Flag ist jedoch gesetzt.' in output:
+            return -2
         ms = output[:output.find('ms')]
         ms = ms[ms.rfind('=') + 1:]
         return int(ms)
