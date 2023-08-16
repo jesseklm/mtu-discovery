@@ -10,12 +10,15 @@ from PyQt5.QtWidgets import QTableWidgetItem
 from custom_signal_window import CustomSignalWindow
 from ui.main import Ui_MainWindow
 
+si = subprocess.STARTUPINFO()
+si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
+
 
 def ping_with_df(target, size):
     command = ['ping', '-f', '-l', str(size), '-n', '1', target]
 
     try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT)
+        output = subprocess.check_output(command, stderr=subprocess.STDOUT, startupinfo=si)
         output = output.decode('utf-8', 'ignore')
         # print(output)
         if 'Zielnetz nicht erreichbar.' in output:
