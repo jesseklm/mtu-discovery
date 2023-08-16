@@ -35,6 +35,8 @@ def ping_with_df(target, size):
             return -2, 'should be fragmented'
         elif f'Ping-Anforderung konnte Host "{target}" nicht finden.' in output:
             return -3, 'host not found'
+        elif 'Zeitberschreitung der Anforderung.' in output:
+            return -5, 'timeout'
         print("error:", output)
         return -1, 'error'
 
