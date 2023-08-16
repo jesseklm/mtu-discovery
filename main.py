@@ -23,20 +23,20 @@ def ping_with_df(target, size):
         # print(output)
         if 'Zielnetz nicht erreichbar.' in output:
             print(output)
-            return -4
+            return -4, 'network not available'
         elif 'Paket msste fragmentiert werden, DF-Flag ist jedoch gesetzt.' in output:
-            return -2
+            return -2, 'should be fragmented'
         ms = output[:output.find('ms')]
         ms = ms[ms.rfind('=') + 1:]
-        return int(ms)
+        return int(ms), f'{ms}ms'
     except subprocess.CalledProcessError as e:
         output = e.output.decode('utf-8', 'ignore')
         if 'Paket msste fragmentiert werden, DF-Flag ist jedoch gesetzt.' in output:
-            return -2
+            return -2, 'should be fragmented'
         elif f'Ping-Anforderung konnte Host "{target}" nicht finden.' in output:
-            return -3
+            return -3, 'host not found'
         print("error:", output)
-        return -1
+        return -1, 'error'
 
 
 class MainWindow(Ui_MainWindow):
@@ -83,20 +83,25 @@ class MainWindow(Ui_MainWindow):
 
     def check_host(self, host, start, end):
         start_time = time.time()
-        last_size = -1
-        for i in range(int(start), int(end)):
-            reply_time = ping_with_df(host, i)
+        fast_search = {'start': int(start), 'end': int(end)}
+        while fast_search['start'] < fast_search['end']:
+            step = fast_search['end'] - fast_search['start']
+            step = int(step / 2)
+            if step == 0:
+                step = 1
+            size_try = fast_search['start'] + step
+            reply_time, message = ping_with_df(host, size_try)
+            self.main_window.signal.emit({'func': self.table_set, 'arg': [size_try, size_try + 28, message]})
+            print(fast_search['start'], fast_search['end'], step, size_try)
             if reply_time >= 0:
-                last_size = i
-                self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, f'{reply_time}ms']})
-            elif reply_time == -2:
-                self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, 'should be fragmented']})
-            elif reply_time == -3:
-                self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, 'host not found']})
+                fast_search['start'] = size_try
+                continue
+            fast_search['end'] = size_try - 1
+        print(fast_search['start'], fast_search['end'])
         self.main_window.signal.emit({'func': self.table_scroll_to_last})
         self.main_window.signal.emit({
             'func': self.main_window.statusBar().showMessage,
-            'arg': f'best MTU ({last_size}) {last_size + 28}'})
+            'arg': f"best MTU ({fast_search['start']}) {fast_search['start'] + 28}"})
         self.pushButton_run.setEnabled(True)
         print(time.time() - start_time)
 
