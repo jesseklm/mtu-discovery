@@ -15,7 +15,7 @@ si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
 def ping_with_df(target, size):
-    command = ['ping', '-f', '-l', str(size), '-n', '1', target]
+    command = ['ping', '-f', '-l', str(size), '-n', '1', '-w', '1000', target]
 
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, startupinfo=si)
@@ -56,7 +56,8 @@ class MainWindow(Ui_MainWindow):
     def run_clicked(self):
         self.pushButton_run.setEnabled(False)
         self.rows.clear()
-        threading.Thread(target=self.check_host,
+        check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
+        threading.Thread(target=check_function,
                          args=(self.lineEdit_host.text(), self.lineEdit_start.text(), self.lineEdit_end.text()),
                          daemon=True).start()
         threading.Thread(target=self.scroll_daemon, daemon=True).start()
@@ -81,7 +82,7 @@ class MainWindow(Ui_MainWindow):
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.verticalScrollBar().setSliderPosition(self.tableWidget.verticalScrollBar().maximum())
 
-    def check_host(self, host, start, end):
+    def check_host_fast(self, host, start, end):
         start_time = time.time()
         fast_search = {'start': int(start), 'end': int(end)}
         while fast_search['start'] < fast_search['end']:
@@ -102,6 +103,21 @@ class MainWindow(Ui_MainWindow):
         self.main_window.signal.emit({
             'func': self.main_window.statusBar().showMessage,
             'arg': f"best MTU ({fast_search['start']}) {fast_search['start'] + 28}"})
+        self.pushButton_run.setEnabled(True)
+        print(time.time() - start_time)
+
+    def check_host(self, host, start, end):
+        start_time = time.time()
+        last_size = -1
+        for i in range(int(start), int(end)):
+            reply_time, message = ping_with_df(host, i)
+            if reply_time >= 0:
+                last_size = i
+            self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, message]})
+        self.main_window.signal.emit({'func': self.table_scroll_to_last})
+        self.main_window.signal.emit({
+            'func': self.main_window.statusBar().showMessage,
+            'arg': f'best MTU ({last_size}) {last_size + 28}'})
         self.pushButton_run.setEnabled(True)
         print(time.time() - start_time)
 

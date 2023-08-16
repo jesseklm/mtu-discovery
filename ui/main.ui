@@ -67,6 +67,16 @@
       </property>
      </widget>
     </item>
+    <item row="0" column="2">
+     <widget class="QCheckBox" name="checkBox_fast">
+      <property name="text">
+       <string>Fast</string>
+      </property>
+      <property name="checked">
+       <bool>true</bool>
+      </property>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
