@@ -146,6 +146,7 @@
   </action>
  </widget>
  <tabstops>
+  <tabstop>comboBox_host</tabstop>
   <tabstop>lineEdit_timeout</tabstop>
   <tabstop>lineEdit_start</tabstop>
   <tabstop>lineEdit_end</tabstop>
