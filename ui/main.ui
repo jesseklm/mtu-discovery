@@ -6,8 +6,8 @@
    <rect>
     <x>0</x>
     <y>0</y>
-    <width>622</width>
-    <height>414</height>
+    <width>461</width>
+    <height>356</height>
    </rect>
   </property>
   <property name="windowTitle">
@@ -15,10 +15,24 @@
   </property>
   <widget class="QWidget" name="centralwidget">
    <layout class="QGridLayout" name="gridLayout">
-    <item row="1" column="0">
-     <widget class="QLabel" name="label">
+    <item row="0" column="2">
+     <widget class="QLabel" name="label_4">
       <property name="text">
-       <string>Start</string>
+       <string>Timeout</string>
+      </property>
+     </widget>
+    </item>
+    <item row="0" column="3">
+     <widget class="QLineEdit" name="lineEdit_timeout">
+      <property name="text">
+       <string>1000</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="2">
+     <widget class="QLabel" name="label_3">
+      <property name="text">
+       <string>End</string>
       </property>
      </widget>
     </item>
@@ -36,10 +50,17 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="0">
-     <widget class="QLabel" name="label_3">
+    <item row="1" column="0">
+     <widget class="QLabel" name="label">
       <property name="text">
-       <string>End</string>
+       <string>Start</string>
+      </property>
+     </widget>
+    </item>
+    <item row="1" column="3">
+     <widget class="QLineEdit" name="lineEdit_end">
+      <property name="text">
+       <string>9000</string>
       </property>
      </widget>
     </item>
@@ -50,24 +71,7 @@
       </property>
      </widget>
     </item>
-    <item row="2" column="1">
-     <widget class="QLineEdit" name="lineEdit_end">
-      <property name="text">
-       <string>9000</string>
-      </property>
-     </widget>
-    </item>
-    <item row="5" column="0" colspan="3">
-     <widget class="QTableWidget" name="tableWidget"/>
-    </item>
-    <item row="2" column="2">
-     <widget class="QPushButton" name="pushButton_run">
-      <property name="text">
-       <string>Run</string>
-      </property>
-     </widget>
-    </item>
-    <item row="0" column="2">
+    <item row="0" column="4">
      <widget class="QCheckBox" name="checkBox_fast">
       <property name="text">
        <string>Fast</string>
@@ -76,6 +80,16 @@
        <bool>true</bool>
       </property>
      </widget>
+    </item>
+    <item row="1" column="4">
+     <widget class="QPushButton" name="pushButton_run">
+      <property name="text">
+       <string>Run</string>
+      </property>
+     </widget>
+    </item>
+    <item row="5" column="0" colspan="5">
+     <widget class="QTableWidget" name="tableWidget"/>
     </item>
    </layout>
   </widget>
@@ -93,8 +107,10 @@
  </widget>
  <tabstops>
   <tabstop>lineEdit_host</tabstop>
+  <tabstop>lineEdit_timeout</tabstop>
   <tabstop>lineEdit_start</tabstop>
   <tabstop>lineEdit_end</tabstop>
+  <tabstop>checkBox_fast</tabstop>
   <tabstop>pushButton_run</tabstop>
   <tabstop>tableWidget</tabstop>
  </tabstops>

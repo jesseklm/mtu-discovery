@@ -14,9 +14,8 @@ si = subprocess.STARTUPINFO()
 si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
-def ping_with_df(target, size):
-    command = ['ping', '-f', '-l', str(size), '-n', '1', '-w', '1000', target]
-
+def ping_with_df(target, size, timeout):
+    command = ['ping', '-f', '-l', str(size), '-n', '1', '-w', timeout, target]
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, startupinfo=si)
         output = output.decode('utf-8', 'ignore')
@@ -60,7 +59,8 @@ class MainWindow(Ui_MainWindow):
         self.rows.clear()
         check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
         threading.Thread(target=check_function,
-                         args=(self.lineEdit_host.text(), self.lineEdit_start.text(), self.lineEdit_end.text()),
+                         args=(self.lineEdit_host.text(), self.lineEdit_start.text(), self.lineEdit_end.text(),
+                               self.lineEdit_timeout.text()),
                          daemon=True).start()
         threading.Thread(target=self.scroll_daemon, daemon=True).start()
 
@@ -84,7 +84,7 @@ class MainWindow(Ui_MainWindow):
         self.tableWidget.resizeColumnsToContents()
         self.tableWidget.verticalScrollBar().setSliderPosition(self.tableWidget.verticalScrollBar().maximum())
 
-    def check_host_fast(self, host, start, end):
+    def check_host_fast(self, host, start, end, timeout):
         start_time = time.time()
         fast_search = {'start': int(start), 'end': int(end)}
         while fast_search['start'] < fast_search['end']:
@@ -93,7 +93,7 @@ class MainWindow(Ui_MainWindow):
             if step == 0:
                 step = 1
             size_try = fast_search['start'] + step
-            reply_time, message = ping_with_df(host, size_try)
+            reply_time, message = ping_with_df(host, size_try, timeout)
             self.main_window.signal.emit({'func': self.table_set, 'arg': [size_try, size_try + 28, message]})
             print(fast_search['start'], fast_search['end'], step, size_try)
             if reply_time >= 0:
@@ -108,11 +108,11 @@ class MainWindow(Ui_MainWindow):
         self.pushButton_run.setEnabled(True)
         print(time.time() - start_time)
 
-    def check_host(self, host, start, end):
+    def check_host(self, host, start, end, timeout):
         start_time = time.time()
         last_size = -1
         for i in range(int(start), int(end)):
-            reply_time, message = ping_with_df(host, i)
+            reply_time, message = ping_with_df(host, i, timeout)
             if reply_time >= 0:
                 last_size = i
             self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, message]})
