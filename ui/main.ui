@@ -43,13 +43,6 @@
       </property>
      </widget>
     </item>
-    <item row="0" column="1">
-     <widget class="QLineEdit" name="lineEdit_host">
-      <property name="text">
-       <string>1.1.1.1</string>
-      </property>
-     </widget>
-    </item>
     <item row="1" column="0">
      <widget class="QLabel" name="label">
       <property name="text">
@@ -91,6 +84,53 @@
     <item row="5" column="0" colspan="5">
      <widget class="QTableWidget" name="tableWidget"/>
     </item>
+    <item row="0" column="1">
+     <widget class="QComboBox" name="comboBox_host">
+      <property name="editable">
+       <bool>true</bool>
+      </property>
+      <item>
+       <property name="text">
+        <string>1.1.1.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>1.0.0.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>9.9.9.9</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>149.112.112.112</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8.8.8.8</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>8.8.4.4</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4.2.2.1</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4.2.2.2</string>
+       </property>
+      </item>
+     </widget>
+    </item>
    </layout>
   </widget>
   <widget class="QStatusBar" name="statusbar"/>
@@ -106,7 +146,6 @@
   </action>
  </widget>
  <tabstops>
-  <tabstop>lineEdit_host</tabstop>
   <tabstop>lineEdit_timeout</tabstop>
   <tabstop>lineEdit_start</tabstop>
   <tabstop>lineEdit_end</tabstop>

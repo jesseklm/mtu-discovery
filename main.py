@@ -60,7 +60,7 @@ class MainWindow(Ui_MainWindow):
         self.rows.clear()
         check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
         threading.Thread(target=check_function,
-                         args=(self.lineEdit_host.text(), self.lineEdit_start.text(), self.lineEdit_end.text(),
+                         args=(self.comboBox_host.currentText(), self.lineEdit_start.text(), self.lineEdit_end.text(),
                                self.lineEdit_timeout.text()),
                          daemon=True).start()
         threading.Thread(target=self.scroll_daemon, daemon=True).start()
