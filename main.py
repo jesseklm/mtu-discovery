@@ -56,6 +56,7 @@ class MainWindow(Ui_MainWindow):
 
     def run_clicked(self):
         self.pushButton_run.setEnabled(False)
+        self.main_window.statusBar().clearMessage()
         self.rows.clear()
         check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
         threading.Thread(target=check_function,
