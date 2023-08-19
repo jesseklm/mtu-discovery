@@ -91,12 +91,7 @@
       </property>
       <item>
        <property name="text">
-        <string>1.1.1.1</string>
-       </property>
-      </item>
-      <item>
-       <property name="text">
-        <string>1.0.0.1</string>
+        <string>149.112.112.112</string>
        </property>
       </item>
       <item>
@@ -106,12 +101,12 @@
       </item>
       <item>
        <property name="text">
-        <string>149.112.112.112</string>
+        <string>1.0.0.1</string>
        </property>
       </item>
       <item>
        <property name="text">
-        <string>8.8.8.8</string>
+        <string>1.1.1.1</string>
        </property>
       </item>
       <item>
@@ -121,12 +116,17 @@
       </item>
       <item>
        <property name="text">
-        <string>4.2.2.1</string>
+        <string>8.8.8.8</string>
        </property>
       </item>
       <item>
        <property name="text">
         <string>4.2.2.2</string>
+       </property>
+      </item>
+      <item>
+       <property name="text">
+        <string>4.2.2.1</string>
        </property>
       </item>
      </widget>
