@@ -6,6 +6,7 @@ import time
 import qdarktheme
 from PyQt5 import QtWidgets
 from PyQt5.QtWidgets import QTableWidgetItem
+from pythonping import ping
 
 from custom_signal_window import CustomSignalWindow
 from ui.main import Ui_MainWindow
@@ -14,7 +15,7 @@ si = subprocess.STARTUPINFO()
 si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
 
 
-def ping_with_df(target, size, timeout):
+def ping_subprocess(target, size, timeout):
     command = ['ping', '-f', '-l', str(size), '-n', '1', '-w', timeout, target]
     try:
         output = subprocess.check_output(command, stderr=subprocess.STDOUT, startupinfo=si)
@@ -38,6 +39,17 @@ def ping_with_df(target, size, timeout):
             return -5, 'timeout'
         print("error:", output)
         return -1, 'error'
+
+
+def ping_socket(target, size, timeout):
+    try:
+        result = ping(target, size=size, verbose=False, df=True, timeout=int(timeout) / 1000, count=1)
+        if result.stats_packets_lost >= 1:
+            return -5, 'timeout'
+        return result.rtt_avg_ms, f'{result.rtt_avg_ms:.1f}ms'
+    except OSError as e:
+        if e.winerror == 10040:
+            return -2, 'should be fragmented'
 
 
 class MainWindow(Ui_MainWindow):
@@ -94,7 +106,7 @@ class MainWindow(Ui_MainWindow):
             if step == 0:
                 step = 1
             size_try = fast_search['start'] + step
-            reply_time, message = ping_with_df(host, size_try, timeout)
+            reply_time, message = ping_socket(host, size_try, timeout)
             self.main_window.signal.emit({'func': self.table_set, 'arg': [size_try, size_try + 28, message]})
             print(fast_search['start'], fast_search['end'], step, size_try)
             if reply_time >= 0:
@@ -113,7 +125,7 @@ class MainWindow(Ui_MainWindow):
         start_time = time.time()
         last_size = -1
         for i in range(int(start), int(end)):
-            reply_time, message = ping_with_df(host, i, timeout)
+            reply_time, message = ping_socket(host, i, timeout)
             if reply_time >= 0:
                 last_size = i
             self.main_window.signal.emit({'func': self.table_set, 'arg': [i, i + 28, message]})

@@ -1,2 +1,3 @@
 PyQt5~=5.15.9
 pyqtdarktheme~=2.1.0
+pythonping @ https://github.com/jesseklm/pythonping/archive/dev.zip
