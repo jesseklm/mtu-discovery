@@ -50,6 +50,12 @@ def ping_socket(target, size, timeout):
     except OSError as e:
         if e.winerror == 10040:
             return -2, 'should be fragmented'
+        print(e)
+    except RuntimeError as e:
+        if 'Cannot resolve address' in str(e):
+            return -3, 'host not found'
+        print(e)
+    return -1, 'error'
 
 
 class MainWindow(Ui_MainWindow):
@@ -62,14 +68,22 @@ class MainWindow(Ui_MainWindow):
 
         self.rows = []
 
+        self.thread_running = False
+        self.thread_exit = False
+
     def show(self):
         self.main_window.show()
         self.app.exec_()
 
     def run_clicked(self):
-        self.pushButton_run.setEnabled(False)
+        if self.thread_running:
+            self.thread_exit = True
+            return
+        self.pushButton_run.setText('Cancel')
         self.main_window.statusBar().clearMessage()
         self.rows.clear()
+        self.thread_running = True
+        self.thread_exit = False
         check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
         threading.Thread(target=check_function,
                          args=(self.comboBox_host.currentText(), self.lineEdit_start.text(), self.lineEdit_end.text(),
@@ -78,7 +92,7 @@ class MainWindow(Ui_MainWindow):
         threading.Thread(target=self.scroll_daemon, daemon=True).start()
 
     def scroll_daemon(self):
-        while not self.pushButton_run.isEnabled():
+        while self.thread_running:
             time.sleep(0.1)
             self.main_window.signal.emit({'func': self.table_scroll_to_last})
 
@@ -101,6 +115,8 @@ class MainWindow(Ui_MainWindow):
         start_time = time.time()
         fast_search = {'start': int(start), 'end': int(end)}
         while fast_search['start'] < fast_search['end']:
+            if self.thread_exit:
+                break
             step = fast_search['end'] - fast_search['start']
             step = int(step / 2)
             if step == 0:
@@ -118,13 +134,16 @@ class MainWindow(Ui_MainWindow):
         self.main_window.signal.emit({
             'func': self.main_window.statusBar().showMessage,
             'arg': f"best MTU ({fast_search['start']}) {fast_search['start'] + 28}"})
-        self.pushButton_run.setEnabled(True)
+        self.thread_running = False
+        self.main_window.signal.emit({'func': self.pushButton_run.setText, 'arg': 'Run'})
         print(time.time() - start_time)
 
     def check_host(self, host, start, end, timeout):
         start_time = time.time()
         last_size = -1
         for i in range(int(start), int(end)):
+            if self.thread_exit:
+                break
             reply_time, message = ping_socket(host, i, timeout)
             if reply_time >= 0:
                 last_size = i
@@ -133,7 +152,8 @@ class MainWindow(Ui_MainWindow):
         self.main_window.signal.emit({
             'func': self.main_window.statusBar().showMessage,
             'arg': f'best MTU ({last_size}) {last_size + 28}'})
-        self.pushButton_run.setEnabled(True)
+        self.thread_running = False
+        self.main_window.signal.emit({'func': self.pushButton_run.setText, 'arg': 'Run'})
         print(time.time() - start_time)
 
 
