@@ -1,4 +1,3 @@
-import subprocess
 import sys
 import threading
 import time
@@ -10,35 +9,6 @@ from pythonping import ping
 
 from custom_signal_window import CustomSignalWindow
 from ui.main import Ui_MainWindow
-
-si = subprocess.STARTUPINFO()
-si.dwFlags |= subprocess.STARTF_USESHOWWINDOW
-
-
-def ping_subprocess(target, size, timeout):
-    command = ['ping', '-f', '-l', str(size), '-n', '1', '-w', timeout, target]
-    try:
-        output = subprocess.check_output(command, stderr=subprocess.STDOUT, startupinfo=si)
-        output = output.decode('utf-8', 'ignore')
-        # print(output)
-        if 'Zielnetz nicht erreichbar.' in output:
-            print(output)
-            return -4, 'network not available'
-        elif 'Paket msste fragmentiert werden, DF-Flag ist jedoch gesetzt.' in output:
-            return -2, 'should be fragmented'
-        ms = output[:output.find('ms')]
-        ms = ms[ms.rfind('=') + 1:]
-        return int(ms), f'{ms}ms'
-    except subprocess.CalledProcessError as e:
-        output = e.output.decode('utf-8', 'ignore')
-        if 'Paket msste fragmentiert werden, DF-Flag ist jedoch gesetzt.' in output:
-            return -2, 'should be fragmented'
-        elif f'Ping-Anforderung konnte Host "{target}" nicht finden.' in output:
-            return -3, 'host not found'
-        elif 'Zeitberschreitung der Anforderung.' in output:
-            return -5, 'timeout'
-        print("error:", output)
-        return -1, 'error'
 
 
 def ping_socket(target, size, timeout):
