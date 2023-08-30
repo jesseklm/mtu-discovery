@@ -36,7 +36,7 @@ class MainWindow(Ui_MainWindow):
 
         self.pushButton_run.clicked.connect(self.run_clicked)
 
-        self.rows = []
+        self.table_set_headers()
 
         self.thread_running = False
         self.thread_exit = False
@@ -51,7 +51,9 @@ class MainWindow(Ui_MainWindow):
             return
         self.pushButton_run.setText('Cancel')
         self.main_window.statusBar().clearMessage()
-        self.rows.clear()
+        self.tableWidget.clear()
+        self.tableWidget.setRowCount(0)
+        self.table_set_headers()
         self.thread_running = True
         self.thread_exit = False
         check_function = self.check_host_fast if self.checkBox_fast.isChecked() else self.check_host
@@ -67,15 +69,15 @@ class MainWindow(Ui_MainWindow):
             self.main_window.signal.emit({'func': self.table_scroll_to_last})
 
     def table_set(self, data):
-        self.rows.append(data)
+        row_count: int = self.tableWidget.rowCount() + 1
+        self.tableWidget.setRowCount(row_count)
+        for j, column in enumerate(data):
+            self.tableWidget.setItem(row_count - 1, j, QTableWidgetItem(str(column)))
+
+    def table_set_headers(self):
         headers = ['Buffer', 'Packet', 'Info']
-        self.tableWidget.clear()
         self.tableWidget.setColumnCount(len(headers))
         self.tableWidget.setHorizontalHeaderLabels(headers)
-        self.tableWidget.setRowCount(len(self.rows))
-        for i, row in enumerate(self.rows):
-            for j, header in enumerate(headers):
-                self.tableWidget.setItem(i, j, QTableWidgetItem(str(row[j])))
 
     def table_scroll_to_last(self):
         self.tableWidget.resizeColumnsToContents()
