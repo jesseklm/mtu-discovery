@@ -4,4 +4,4 @@ clean:
 	rm -f *.py
 
 %.py: %.ui
-	pyuic5 -x $< -o $@
+	pyuic6 -x $< -o $@

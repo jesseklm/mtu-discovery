@@ -3,8 +3,8 @@ import threading
 import time
 
 import qdarktheme
-from PyQt5 import QtWidgets
-from PyQt5.QtWidgets import QTableWidgetItem
+from PyQt6 import QtWidgets
+from PyQt6.QtWidgets import QTableWidgetItem
 from pythonping import ping
 
 from custom_signal_window import CustomSignalWindow
@@ -43,7 +43,7 @@ class MainWindow(Ui_MainWindow):
 
     def show(self):
         self.main_window.show()
-        self.app.exec_()
+        self.app.exec()
 
     def run_clicked(self):
         if self.thread_running:
