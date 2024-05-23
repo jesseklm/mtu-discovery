@@ -1,4 +1,4 @@
-all: main.py settings.py
+all: main.py
 
 clean:
 	rm -f *.py
