@@ -1,6 +1,7 @@
 import asyncio
 import socket
 import struct
+import sys
 import time
 from typing import Callable
 
@@ -20,7 +21,25 @@ class MtuTool:
         self.stop_scan = False
 
     @staticmethod
-    async def ping_socket(target, size, timeout) -> tuple[int, str]:
+    def ping_win(target, size, timeout) -> tuple[int, str]:
+        from pythonping import ping
+        try:
+            result = ping(target, size=size, verbose=False, df=True, timeout=timeout, count=1)
+            if result.stats_packets_lost >= 1:
+                return -5, 'timeout'
+            return result.rtt_avg_ms, f'{result.rtt_avg_ms:.1f}ms'
+        except OSError as e:
+            if e.winerror == 10040:
+                return -2, 'should be fragmented'
+            print(e)
+        except RuntimeError as e:
+            if 'Cannot resolve address' in str(e):
+                return -3, 'host not found'
+            print(e)
+        return -1, 'error'
+
+    @staticmethod
+    async def ping_socket_linux(target, size, timeout) -> tuple[int, str]:
         loop = asyncio.get_running_loop()
         try:
             ip = socket.gethostbyname(target)
@@ -56,6 +75,14 @@ class MtuTool:
         ms = (time.perf_counter() - t0) * 1000.0
         return ms, f'{ms:.1f}ms'
 
+    @staticmethod
+    async def ping(target, size, timeout) -> tuple[int, str]:
+        if sys.platform.startswith('linux'):
+            return await MtuTool.ping_socket_linux(target, size, timeout)
+        elif sys.platform == 'win32':
+            return await asyncio.to_thread(MtuTool.ping_win, target, size, timeout)
+        return -1, 'unknown os'
+
     def set_stop_scan(self):
         if self.scanning:
             self.stop_scan = True
@@ -74,7 +101,7 @@ class MtuTool:
             if step == 0:
                 step = 1
             size_try = fast_search['start'] + step
-            reply_time, message = await self.ping_socket(self.host, size_try, self.timeout_ms / 1000)
+            reply_time, message = await self.ping(self.host, size_try, self.timeout_ms / 1000)
             yield {
                 'Buffer': size_try,
                 'Packet': size_try + 28,
@@ -97,7 +124,7 @@ class MtuTool:
         for i in range(self.range_start, self.range_stop):
             if self.stop_scan:
                 break
-            reply_time, message = await self.ping_socket(self.host, i, self.timeout_ms / 1000)
+            reply_time, message = await self.ping(self.host, i, self.timeout_ms / 1000)
             if reply_time >= 0:
                 last_size = i
             yield {
