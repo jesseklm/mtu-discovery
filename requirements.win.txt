@@ -1,2 +1,0 @@
--r requirements.txt
-pythonping @ https://github.com/jesseklm/pythonping/archive/dev.zip

@@ -1,0 +1,12 @@
+[project]
+name = "mtu-discovery"
+version = "0.0.1"
+requires-python = "==3.13.*"
+dependencies = [
+    "pyside6>=6.10.1",
+    "pythonping ; sys_platform == 'win32'",
+    "qasync>=0.28.0",
+]
+
+[tool.uv.sources]
+pythonping = { url = "https://github.com/jesseklm/pythonping/archive/dev.zip" }
