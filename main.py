@@ -1,7 +1,7 @@
 # nuitka-project: --enable-plugin=pyside6
 # nuitka-project-if: {OS} == "Windows":
 #     nuitka-project: --onefile-cache-mode=cached
-#     nuitka-project: --onefile-tempdir-spec="{PROGRAM_DIR}/.nat-tool"
+#     nuitka-project: --onefile-tempdir-spec="{PROGRAM_DIR}/.mtu-discovery"
 #     nuitka-project: --windows-console-mode=disable
 
 import asyncio
